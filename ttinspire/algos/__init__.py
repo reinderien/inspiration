@@ -1,5 +1,9 @@
+from math import factorial
+from ..params import ops
+
+
 class Algorithm:
-    def __init__(self, inputs, dest, exhaust, n_leaves_worst):
+    def __init__(self, inputs, dest, exhaust, n_leaves_worst=None):
         """
         Abstract algorithm parent
         :param inputs: The integers on the left-hand side of the equation
@@ -12,6 +16,8 @@ class Algorithm:
         self.exhaust = exhaust
         self.answers = []
         self.n_leaves = 0
+        if n_leaves_worst is None:
+            n_leaves_worst = len(ops)**(len(inputs)-1) * factorial(len(inputs))
         self.n_leaves_worst = n_leaves_worst
         self.first_leaf = None
 

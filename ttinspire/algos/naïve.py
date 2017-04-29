@@ -1,5 +1,5 @@
 from itertools import permutations
-from math import factorial, fabs
+from math import fabs
 from . import Algorithm
 from ..params import ops
 
@@ -7,8 +7,7 @@ from ..params import ops
 class Naïve(Algorithm):
 
     def __init__(self, inputs, dest, exhaust=False):
-        super().__init__(inputs, dest, exhaust,
-                         n_leaves_worst=len(ops)**(len(inputs)-1) * factorial(len(inputs)))
+        super().__init__(inputs, dest, exhaust)
 
     def recurse(self, val_so_far, expr, operands):
         """

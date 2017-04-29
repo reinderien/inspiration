@@ -27,7 +27,7 @@ Thumbtack beer glass.
 Stated more formally, let there be _n_ integers x<sub>i</sub> on the left-hand side of an 
 equation, and an integer _y_ on the right-hand side of that equation, where
 
-n > 1
+n ≥ 2
 
 0 ≤ i < n
 
@@ -35,8 +35,16 @@ n > 1
 
 1 ≤ y ≤ 9
 
-A strict interpretation would enforce a maximum count of four cards (suits) per value, but that 
-criterion is disregarded for the purposes of this discussion.
+A strict interpretation would enforce a maximum count of four cards (suits) per card value, but 
+that criterion is disregarded for the purposes of this discussion.
+
+A strict interpretation would also impose an upper bound on _n_. Since there are 4 suits, 9 cards
+per suit, a minimum of 2 players, and _n_ cards per player plus one shared _y_ card, the upper 
+bound for _n_ is:
+
+2 ≤ n ≤ (4 * 9 - 1)/2
+
+2 ≤ n ≤ 17
 
 There are _n_ - 1 operators ƒ<sub>j</sub> between the elements of _x_ . Each ƒ is a binary 
 arithmetic operator with conventional associativity and commutativity but non-conventional order of 
@@ -112,10 +120,33 @@ search space; and there are only two solutions:
 ### Naïve
 
 The naïve (or brute-force) algorithm is the easiest to implement but certainly not the most 
-efficient. It was the most popular (only?) algorithm seen in use at PyCon. It basically looks like:
+efficient. It was the most popular (perhaps only?) algorithm seen in use at PyCon. It basically 
+looks like:
 
-    for every permutation of x:
-        for every possible operator ƒ:
+    for each of n! permutations of x:
+        for each of the 4^(n-1) combinations of ƒ:
             evaluate LHS
-            check for equality with y
+            if LHS == y:
+                print solution
+                exit
 
+This algorithm is trivially parallelized: the easiest method is to perform the permutation in a 
+parent thread and assign subdivided ƒ search space to _m_ children, such that all children have 
+the same set of inputs in the same order but attempt different combinations for ƒ. Each 
+child will have a search space size of 4<sup>n - 1</sup>/m . Whichever child 
+finds the first solution returns it to the parent, the parent cancels all children and completes 
+execution.
+
+    for each of n! permutations of x:
+        fork m children each searching 4^(n-1) / m combinations of ƒ
+        join on any child completion
+        if a child found a solution:
+            cancel other children
+            print solution
+            exit
+        join on all remaining children
+
+A more carefully optimized solution would be to forego Python, and use
+[SIMD](https://en.wikipedia.org/wiki/SIMD) for a specific processor architecture. Each child 
+element of the vectorized operation would have to have a different set of inputs but the same 
+operations; thus, 

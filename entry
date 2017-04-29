@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+
+from ttinspire.cli import *
+
+# This file exists because PyCharm still can't quite figure out how to debug a module as an entry
+# point
+
+# once([1,1,1,1], 1, exhaust=True)
+# find_tough(5)
+run_cli()

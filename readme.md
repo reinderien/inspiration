@@ -77,8 +77,8 @@ The size _N_ of the (naïve) search space is then
 
 N = 4<sup>n - 1</sup> ( n ! )
 
-For given _x_ and _y_ the solution is not unique, nor is there a guarantee of a solution. By 
-trivial example, there is no solution for
+For given _x_ and _y_ the solution is not necessarily unique, nor is there necessarily a solution.
+By example, there is no solution for
 
     x = (1, 1), y = 9
 
@@ -98,7 +98,7 @@ Some inputs are thus more difficult than others, difficulty being measured by bo
 solutions in the problem space as well as (more importantly) the number of candidates assessed 
 before the first solution is found.
 
-For example, evaluating all of the possible inputs where _n_ = 4, _N_ = 1536;  and using the naïve
+For example, evaluating all of the possible inputs where _n_ = 4, _N_ = 1536; and using the naïve
 algorithm described later, the problem difficult is heavily dependent on which inputs are chosen.
 For the following inputs, a solution is found after only 7 iterations. There are 480 solutions
 (without discarding non-unique solutions):
@@ -132,11 +132,11 @@ looks like:
 
 ### Naïve/Parallel
 
-This algorithm is trivially parallelized: the easiest method is to perform the permutation in a 
-parent thread and assign subdivided ƒ search space to _m_ children, such that all children have 
-the same set of inputs in the same order but attempt different combinations for ƒ. Each child will 
-have a search space size of 4<sup>n - 1</sup>/m . Whichever child finds the first solution returns 
-it to the parent, the parent cancels all children and completes execution.
+This algorithm is easily parallelized: the simplest method is to perform the permutation in a parent
+thread and assign subdivided ƒ search space to _m_ children, such that all children have the same
+set of inputs in the same order but attempt different combinations for ƒ. Each child will have a
+search space size of 4<sup>n - 1</sup>/m . Whichever child finds the first solution returns it to
+the parent, the parent cancels all children and completes execution.
 
     for each of n! permutations of x:
         fork m children each searching 4^(n-1) / m combinations of ƒ
@@ -149,8 +149,8 @@ it to the parent, the parent cancels all children and completes execution.
 
 ### Naïve/Parallel with SIMD
 
-A more carefully optimized solution would be to forego Python, and use
-[SIMD](https://en.wikipedia.org/wiki/SIMD) for a specific processor architecture - either on a 
+A more carefully optimized solution would be to use
+[SIMD](https://en.wikipedia.org/wiki/SIMD) on an appropriate processor architecture - either on a 
 CPU or a GPU.
 
 Contemporary Intel CPUs offer up to
@@ -163,7 +163,8 @@ Using [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphic
 can offer even greater parallel speedup. For example, nVidia offers GPUs with core counts well in 
 excess of
 [4,000](https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units#Tesla) before 
-taking other parallelism into account.
+taking other parallelism into account. There are various Python bindings for
+[OpenCL](https://en.wikipedia.org/wiki/OpenCL) able to target this hardware.
 
 Using a SIMD scheme, there would be two levels of parallelism: core/thread children, and vectorized 
 elements within each of those cores. Within a single core, each element of the vectorized operation

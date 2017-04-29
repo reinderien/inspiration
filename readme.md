@@ -75,7 +75,7 @@ Assuming that the entries of _x_ are (in the worst case) unique, the number of p
 
 The size _N_ of the (naïve) search space is then
 
-N = 4<sup>n - 1</sup> n !
+N = 4<sup>n - 1</sup> ( n ! )
 
 For given _x_ and _y_ the solution is not unique, nor is there a guarantee of a solution. By 
 trivial example, there is no solution for
@@ -130,12 +130,13 @@ looks like:
                 print solution
                 exit
 
+### Naïve/Parallel
+
 This algorithm is trivially parallelized: the easiest method is to perform the permutation in a 
 parent thread and assign subdivided ƒ search space to _m_ children, such that all children have 
-the same set of inputs in the same order but attempt different combinations for ƒ. Each 
-child will have a search space size of 4<sup>n - 1</sup>/m . Whichever child 
-finds the first solution returns it to the parent, the parent cancels all children and completes 
-execution.
+the same set of inputs in the same order but attempt different combinations for ƒ. Each child will 
+have a search space size of 4<sup>n - 1</sup>/m . Whichever child finds the first solution returns 
+it to the parent, the parent cancels all children and completes execution.
 
     for each of n! permutations of x:
         fork m children each searching 4^(n-1) / m combinations of ƒ
@@ -146,7 +147,26 @@ execution.
             exit
         join on all remaining children
 
+### Naïve/Parallel with SIMD
+
 A more carefully optimized solution would be to forego Python, and use
-[SIMD](https://en.wikipedia.org/wiki/SIMD) for a specific processor architecture. Each child 
-element of the vectorized operation would have to have a different set of inputs but the same 
-operations; thus, 
+[SIMD](https://en.wikipedia.org/wiki/SIMD) for a specific processor architecture - either on a 
+CPU or a GPU.
+
+Contemporary Intel CPUs offer up to
+[512-element-wide SIMD](https://en.wikipedia.org/wiki/AVX-512),
+[28 cores](https://en.wikipedia.org/wiki/List_of_Intel_Xeon_microprocessors#.22Skylake-SP.22_.2814_nm.29_Scalable_Performance),
+and 2 semi-parallel "hyper-threads" per core, allowing a theoretical parallel speedup on the order
+of ~10,000 - 20,000.
+
+Using [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)
+can offer even greater parallel speedup. For example, nVidia offers GPUs with core counts well in 
+excess of
+[4,000](https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units#Tesla) before 
+taking other parallelism into account.
+
+Using a SIMD scheme, there would be two levels of parallelism: core/thread children, and vectorized 
+elements within each of those cores. Within a single core, each element of the vectorized operation
+would have to have a different set of _x_ inputs but the same ƒ operations. Division of the _x_ 
+search space would then need to occur across SIMD elements, with all elements in the core using the
+same ƒ set. The top-level parent would divide the ƒ search space across cores.

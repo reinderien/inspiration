@@ -159,8 +159,7 @@ A brief implementation of this algorithm (indeed, briefer than what I submitted 
             for x, op in zip(perm[1:], ops):
                 val = op[0](val, x)
             if val == inputs[-1]:
-                print(' '.join('%d %s' % (n, o[1]) for n, o in zip(perm[:-1], ops)),
-                      perm[-1], '=', inputs[-1])
+                print(' '.join('%d %s' % (n, o[1]) for n, o in zip(perm[:-1], ops)), perm[-1])
                 sys.exit()
     print('Invalid')
 

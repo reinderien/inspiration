@@ -24,6 +24,10 @@ but with an arbitrary number of inputs. The number to solve for was always the l
 the string, but the total number of operands was not constant. These solvers won the coveted 
 Thumbtack beer glass.
 
+<img src="challenge.png" alt="Original problem statement" />
+
+_Original problem statement_
+
 Stated more formally, let there be _n_ integers x<sub>i</sub> on the left-hand side of an 
 equation, and an integer _y_ on the right-hand side of that equation, where
 
@@ -120,8 +124,8 @@ search space; and there are only two solutions:
 ### Naïve
 
 The naïve (or brute-force) algorithm is the easiest to implement but certainly not the most 
-efficient. It was the most popular (perhaps only?) algorithm seen in use at PyCon. It basically 
-looks like:
+efficient. It was the most popular (perhaps only?) algorithm seen in use at PyCon. In pseudocode 
+it looks like:
 
     for each of n! permutations of x:
         for each of the 4^(n-1) combinations of ƒ:
@@ -129,6 +133,32 @@ looks like:
             if LHS == y:
                 print solution
                 exit
+
+The combinations of ƒ are searched in one of several equivalent ways. A recursive function can be
+used that, either from left to right or right to left, iterates through the possibilities for
+ƒ<sub>j</sub> at four times the speed of ƒ<sub>j - 1</sub>. Alternatively, the combinations of ƒ 
+can be represented as a radix-4 integer with _n_ - 1 digits where each digit represents one 
+operator, and the integer increments from 0 through 4<sup>n - 1</sup> - 1. Yet another option is 
+to simply use Python's _itertools.product_ (as in, the Cartesian product) with _repeat_ set to 
+_n_ - 1.
+
+A brief implementation of this algorithm (indeed, briefer than what I submitted in 2015) is:
+
+    import itertools, re, sys, operator
+    
+    ops = tuple(zip((operator.add, operator.sub, operator.mul, operator.truediv), '+-*/'))
+    inputs = [int(i) for i in re.findall('\S+', sys.stdin.readline())]
+    for permuted in itertools.permutations(inputs[:-1]):
+        for operators in itertools.product(ops, repeat=len(inputs)-2):
+            val = permuted[0]
+            for x, op in zip(permuted[1:], operators):
+                val = op[0](val, x)
+            if val == inputs[-1]:
+                print(' '.join('%d %s' % (n, o[1]) for n, o in zip(permuted[:-1], operators)),
+                      permuted[-1], '=', inputs[-1])
+                sys.exit()
+    print('Invalid')
+
 
 ### Naïve/Parallel
 
@@ -171,3 +201,24 @@ elements within each of those cores. Within a single core, each element of the v
 would have to have a different set of _x_ inputs but the same ƒ operations. Division of the _x_ 
 search space would then need to occur across SIMD elements, with all elements in the core using the
 same ƒ set. The top-level parent would divide the ƒ search space across cores.
+
+### Gray-code
+
+[Gray code](https://en.wikipedia.org/wiki/Gray_code) is a method of incrementing binary numbers 
+such that only one digit changes at a time, but all possible values are still visited. For 
+instance, for a 3-bit integer:
+
+    0 0 0
+    0 0 1
+    0 1 1
+    0 1 0
+    1 1 0
+    1 1 1
+    1 0 1
+    1 0 0
+
+
+
+### Condensed-section
+
+todo.

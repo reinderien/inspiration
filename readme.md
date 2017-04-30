@@ -24,9 +24,13 @@ but with an arbitrary number of inputs. The number to solve for was always the l
 the string, but the total number of operands was not constant. These solvers won the coveted 
 Thumbtack beer glass.
 
+
+## Original problem statement
+
 <img src="challenge.png" alt="Original problem statement" />
 
-_Original problem statement_
+
+## Problem formalization
 
 Stated more formally, let there be _n_ integers x<sub>i</sub> on the left-hand side of an 
 equation, and an integer _y_ on the right-hand side of that equation, where
@@ -144,18 +148,19 @@ _n_ - 1.
 
 A brief implementation of this algorithm (indeed, briefer than what I submitted in 2015) is:
 
-    import itertools, re, sys, operator
+    #!/usr/bin/env python3
+    import itertools, operator as opr, re, sys
     
-    ops = tuple(zip((operator.add, operator.sub, operator.mul, operator.truediv), '+-*/'))
+    operators = tuple(zip((opr.add, opr.sub, opr.mul, opr.truediv), '+-*/'))
     inputs = [int(i) for i in re.findall('\S+', sys.stdin.readline())]
-    for permuted in itertools.permutations(inputs[:-1]):
-        for operators in itertools.product(ops, repeat=len(inputs)-2):
-            val = permuted[0]
-            for x, op in zip(permuted[1:], operators):
+    for perm in itertools.permutations(inputs[:-1]):
+        for ops in itertools.product(operators, repeat=len(perm)-1):
+            val = perm[0]
+            for x, op in zip(perm[1:], ops):
                 val = op[0](val, x)
             if val == inputs[-1]:
-                print(' '.join('%d %s' % (n, o[1]) for n, o in zip(permuted[:-1], operators)),
-                      permuted[-1], '=', inputs[-1])
+                print(' '.join('%d %s' % (n, o[1]) for n, o in zip(perm[:-1], ops)),
+                      perm[-1], '=', inputs[-1])
                 sys.exit()
     print('Invalid')
 

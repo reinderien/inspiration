@@ -32,12 +32,12 @@ potential for complexity given any cursory thought. And snipe it did: I've been 
 thinking on and off about this for two years and counting.
 
 
-## Original problem statement
+### Original problem statement
 
 <img src="challenge.png" alt="Original problem statement" />
 
 
-## Problem formalization
+### Problem formalization
 
 Stated more formally, let there be _n_ integers x<sub>i</sub> on the left-hand side of an 
 equation, and an integer _y_ on the right-hand side of that equation, where
@@ -79,7 +79,7 @@ The goal is to permute _x_ and choose each ƒ to satisfy the equation. Where the
 solutions, the first one found is taken and the rest are discarded.
 
 
-## Problem Analysis
+### Problem Analysis
 
 The cardinality of the ƒ function set is:
 
@@ -174,6 +174,10 @@ There are surely ways to code-golf this down even further, but this implementati
 it simply uses _itertools.permutations_ to search through all _x_; uses _itertools.product_ to 
 search through all ƒ; and uses _functools.reduce_ to evaluate the result.
 
+This brute-force method can be very slow: since the search through _x_ is O(n!), the search 
+through ƒ is O(4<sup>n - 1</sup>), and the evaluation of the LHS is O(n), the overall worst-case
+runtime is O(n! 4<sup>n - 1</sup> n) .
+
 
 ### Naïve/Parallel
 
@@ -217,11 +221,15 @@ would have to have a different set of _x_ inputs but the same ƒ operations. Div
 search space would then need to occur across SIMD elements, with all elements in the core using the
 same ƒ set. The top-level parent would divide the ƒ search space across cores.
 
-### Gray-code
+### Gray code
 
-[Gray code](https://en.wikipedia.org/wiki/Gray_code) is a method of incrementing binary numbers 
-such that only one digit changes at a time, but all possible values are still visited. For 
-instance, for a 3-bit integer:
+Whenever a new ƒ is attempted in the naïve algorithm, it takes O(n) time to re-evaluate the LHS in
+order to compare it to _y_ on the RHS. But some improvement can be made, by ensuring that only one
+ƒ<sub>j</sub> changes at a time, reducing this factor to O(1).
+
+[Gray code](https://en.wikipedia.org/wiki/Gray_code#n-ary_Gray_code) is a method of incrementing
+numbers such that only one digit changes at a time, but all possible values are still visited. For 
+instance, for a 3-bit binary integer:
 
     0 0 0
     0 0 1
@@ -231,6 +239,30 @@ instance, for a 3-bit integer:
     1 1 1
     1 0 1
     1 0 0
+
+Since ƒ can be modelled as a radix-4 integer with _n_ - 1 digits, there is benefit to having it 
+increment by Gray code instead of linearly. Whenever an ƒ<sub>j</sub> changes, the computed value
+from ƒ<sub>0</sub> through ƒ<sub>j - 1</sub> can stay the same; and the computed composite 
+function equivalent to ƒ<sub>j + 1</sub> through ƒ<sub>n - 1</sub> can also stay the same.
+
+For _n_ = 4 and a single permutation of _x_, the search through all ƒ would look like:
+
+    + + +
+    - + +
+    * + +
+    / + +
+    / - +
+    + - +
+    - - +
+    * - +
+    * * +
+    / * +
+    + * +
+    - * +
+    ...
+    
+
+This optimization will have the greatest effect when the player has a large hand of up to 17 cards.
 
 
 

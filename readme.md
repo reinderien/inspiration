@@ -34,7 +34,8 @@ thinking on and off about this for two years and counting.
 
 ### Original problem statement
 
-<img src="challenge.png" alt="Original problem statement" />
+<img src="doc/challenge.png" alt="Original problem statement"
+    style="border: thin solid lightgrey"/>
 
 
 ### Problem formalization

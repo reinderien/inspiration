@@ -24,6 +24,13 @@ but with an arbitrary number of inputs. The number to solve for was always the l
 the string, but the total number of operands was not constant. These solvers won the coveted 
 Thumbtack beer glass.
 
+Other than on Thumbtack's own blog, discussion and solutions (other than a
+[dead link](https://gist.github.com/shayel/736f143cb4f7d2310c5b "11 lines solution for https://www.thumbtack.com/engineering/pycon-2015")
+here and there) seem to be unfortunately non-existent. This kind of problem is dangerous for me 
+because it's an ideal [nerd snipe](https://xkcd.com/356/): simple on its face, but with lots of 
+potential for complexity given any cursory thought. And snipe it did: I've been occasionally 
+thinking on and off about this for two years and counting.
+
 
 ## Original problem statement
 
@@ -162,6 +169,10 @@ for perm in itertools.permutations(inputs[:-1]):
             sys.exit()
 print('Invalid')
 ```
+
+There are surely ways to code-golf this down even further, but this implementation is non-magical -
+it simply uses _itertools.permutations_ to search through all _x_; uses _itertools.product_ to 
+search through all ƒ; and uses _functools.reduce_ to evaluate the result.
 
 
 ### Naïve/Parallel

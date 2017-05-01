@@ -147,14 +147,6 @@ it looks like:
                 print solution
                 exit
 
-The combinations of ƒ are searched in one of several equivalent ways. A recursive function can be
-used that, either from left to right or right to left, iterates through the possibilities for
-ƒ<sub>i</sub> at four times the speed of ƒ<sub>i - 1</sub>. Alternatively, the combinations of ƒ 
-can be represented as a radix-4 integer with _n_ - 1 digits where each digit represents one 
-operator, and the integer increments from 0 through 4<sup>n - 1</sup> - 1. Yet another option is 
-to simply use Python's _itertools.product_ (as in, the Cartesian product) with _repeat_ set to 
-_n_ - 1.
-
 A brief implementation of this algorithm (indeed, briefer than what I submitted in 2015) is:
 
 ```python
@@ -173,8 +165,11 @@ print('Invalid')
 ```
 
 There are surely ways to code-golf this down even further, but this implementation is non-magical -
-it simply uses _itertools.permutations_ to search through all _x_; uses _itertools.product_ to 
-search through all ƒ; and uses _functools.reduce_ to evaluate the result.
+it simply uses:
+* _itertools.permutations_ to search through all _x_; 
+* _itertools.product_ (as in, the Cartesian product) with _repeat_ set to _n_ - 1 to search 
+  through all ƒ; and
+* _functools.reduce_ to evaluate the result.
 
 This brute-force method can be very slow: since the search through _x_ is O(n!), the search 
 through ƒ is O(4<sup>n - 1</sup>), and the evaluation of the LHS is O(n), the overall worst-case
@@ -223,10 +218,22 @@ would have to have a different set of _x_ inputs but the same ƒ operations. Div
 search space would then need to occur across SIMD elements, with all elements in the core using the
 same ƒ set. The top-level parent would divide the ƒ search space across cores.
 
-### Gray code
+### Recursive-ƒ
 
 Whenever a new ƒ is attempted in the naïve algorithm, it takes O(n) time to re-evaluate the LHS in
-order to compare it to _y_ on the RHS. But some improvement can be made, by ensuring that only one
+order to compare it to _y_ on the RHS - but this O(n) factor can be reduced.
+
+A recursive function can be used that, either from left to right or right to left, iterates 
+through the possibilities for ƒ<sub>i</sub> at four times the speed of ƒ<sub>i - 1</sub>. Even 
+though it is more complicated than calling _itertools.product_, it offers speedup by reducing
+evaluation redundancy. This is achieved on every recursion at depth _i_, reusing the prior value 
+computed at upper depths 0 through _i_ - 1.
+
+
+### Gray code
+
+As with the recursive-ƒ algorithm, the O(n) factor can be reduced by eliminating some redundant 
+re-evaluation of sections of the LHS. In this case, we attempt this by ensuring that only one
 ƒ<sub>i</sub> changes at a time, reducing this factor to O(1).
 
 [Gray code](https://en.wikipedia.org/wiki/Gray_code#n-ary_Gray_code) is a method of incrementing
@@ -242,10 +249,11 @@ instance, for a 3-bit binary integer:
     1 0 1
     1 0 0
 
-Since ƒ can be modelled as a radix-4 integer with _n_ - 1 digits, there is benefit to having it 
-increment by Gray code instead of linearly. Whenever an ƒ<sub>i</sub> changes, the computed value
-from ƒ<sub>0</sub> through ƒ<sub>i - 1</sub> can stay the same; and the computed composite 
-function equivalent to ƒ<sub>i + 1</sub> through ƒ<sub>n - 2</sub> can also stay the same.
+ƒ can be modelled as a radix-4 integer with _n_ - 1 digits, where each digit represents one 
+operator, and the integer increments from 0 through 4<sup>n - 1</sup> - 1. There is benefit to 
+having it increment by Gray code instead of linearly. Whenever an ƒ<sub>i</sub> changes, the
+computed value from ƒ<sub>0</sub> through ƒ<sub>i - 1</sub> can stay the same; and the computed 
+composite function equivalent to ƒ<sub>i + 1</sub> through ƒ<sub>n - 2</sub> can also stay the same.
 
 For _n_ = 4 and a single permutation of _x_, the search through all ƒ would look like:
 
@@ -265,8 +273,6 @@ For _n_ = 4 and a single permutation of _x_, the search through all ƒ would loo
     
 
 This optimization will have the greatest effect when the player has a large hand of up to 17 cards.
-
-
 
 ### Condensed-section
 

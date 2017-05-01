@@ -149,17 +149,15 @@ _n_ - 1.
 A brief implementation of this algorithm (indeed, briefer than what I submitted in 2015) is:
 
     #!/usr/bin/env python3
-    import itertools, operator as opr, re, sys
+    import functools, itertools, operator as opr, re, sys
     
     operators = tuple(zip((opr.add, opr.sub, opr.mul, opr.truediv), '+-*/'))
     inputs = [int(i) for i in re.findall('\S+', sys.stdin.readline())]
     for perm in itertools.permutations(inputs[:-1]):
         for ops in itertools.product(operators, repeat=len(perm)-1):
-            val = perm[0]
-            for x, op in zip(perm[1:], ops):
-                val = op[0](val, x)
-            if val == inputs[-1]:
-                print(' '.join('%d %s' % (n, o[1]) for n, o in zip(perm[:-1], ops)), perm[-1])
+            funcs = tuple(zip(ops, perm[1:]))
+            if inputs[-1] == functools.reduce(lambda n, fun: fun[0][0](n, fun[1]), funcs, perm[0]):
+                print(perm[0], ' '.join('%s %d' % (o[1], n) for o, n in funcs))
                 sys.exit()
     print('Invalid')
 

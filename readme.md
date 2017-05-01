@@ -39,7 +39,7 @@ thinking on and off about this for two years and counting.
 
 ### Problem formalization
 
-Stated more formally, let there be _n_ integers x<sub>i</sub> on the left-hand side of an 
+Stated more formally, let there be _n_ integers _x_<sub>i</sub> on the left-hand side of an 
 equation, and an integer _y_ on the right-hand side of that equation, where
 
 n ≥ 2
@@ -61,9 +61,10 @@ bound for _n_ is:
 
 2 ≤ n ≤ 17
 
-There are _n_ - 1 operators ƒ<sub>j</sub> between the elements of _x_ . Each ƒ is a binary 
-arithmetic operator with conventional associativity and commutativity but non-conventional order of 
-operations. The equation is assumed to be evaluated in a flat, left-to-right manner, that is,
+There are _n_ - 1 operators ƒ<sub>i</sub> between the elements of _x_<sub>i</sub> and 
+_x_<sub>i + 1</sub> . Each ƒ is a binary arithmetic operator with conventional associativity and 
+commutativity but non-conventional order of operations. The equation is assumed to be evaluated in a
+flat, left-to-right manner, that is,
 
 x<sub>0</sub> [ƒ<sub>0</sub>] x<sub>1</sub> [ƒ<sub>1</sub>] x<sub>2</sub> [ƒ<sub>2</sub>] ...
 [ƒ<sub>n - 2</sub>] x<sub>n - 1</sub>= y
@@ -147,7 +148,7 @@ it looks like:
 
 The combinations of ƒ are searched in one of several equivalent ways. A recursive function can be
 used that, either from left to right or right to left, iterates through the possibilities for
-ƒ<sub>j</sub> at four times the speed of ƒ<sub>j - 1</sub>. Alternatively, the combinations of ƒ 
+ƒ<sub>i</sub> at four times the speed of ƒ<sub>i - 1</sub>. Alternatively, the combinations of ƒ 
 can be represented as a radix-4 integer with _n_ - 1 digits where each digit represents one 
 operator, and the integer increments from 0 through 4<sup>n - 1</sup> - 1. Yet another option is 
 to simply use Python's _itertools.product_ (as in, the Cartesian product) with _repeat_ set to 
@@ -225,7 +226,7 @@ same ƒ set. The top-level parent would divide the ƒ search space across cores.
 
 Whenever a new ƒ is attempted in the naïve algorithm, it takes O(n) time to re-evaluate the LHS in
 order to compare it to _y_ on the RHS. But some improvement can be made, by ensuring that only one
-ƒ<sub>j</sub> changes at a time, reducing this factor to O(1).
+ƒ<sub>i</sub> changes at a time, reducing this factor to O(1).
 
 [Gray code](https://en.wikipedia.org/wiki/Gray_code#n-ary_Gray_code) is a method of incrementing
 numbers such that only one digit changes at a time, but all possible values are still visited. For 
@@ -241,9 +242,9 @@ instance, for a 3-bit binary integer:
     1 0 0
 
 Since ƒ can be modelled as a radix-4 integer with _n_ - 1 digits, there is benefit to having it 
-increment by Gray code instead of linearly. Whenever an ƒ<sub>j</sub> changes, the computed value
-from ƒ<sub>0</sub> through ƒ<sub>j - 1</sub> can stay the same; and the computed composite 
-function equivalent to ƒ<sub>j + 1</sub> through ƒ<sub>n - 1</sub> can also stay the same.
+increment by Gray code instead of linearly. Whenever an ƒ<sub>i</sub> changes, the computed value
+from ƒ<sub>0</sub> through ƒ<sub>i - 1</sub> can stay the same; and the computed composite 
+function equivalent to ƒ<sub>i + 1</sub> through ƒ<sub>n - 2</sub> can also stay the same.
 
 For _n_ = 4 and a single permutation of _x_, the search through all ƒ would look like:
 

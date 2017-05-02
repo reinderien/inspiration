@@ -13,11 +13,13 @@ for p in permutations(range(4)):
     print()
     prev = p
 
+
 print("Heap's algorithm:")
 # See https://en.wikipedia.org/wiki/Heap%27s_algorithm
 
 prev = None
 seen = set()
+
 def emit(A):
     A = tuple(A)
     print(A, end='')
@@ -30,20 +32,43 @@ def emit(A):
     seen.add(A)
     prev = A
 
-
-def recurse(A, n=None):
+def heap_recurse(A, n=None):
     if n is None:
         n = len(A)
     if n == 1:
         emit(A)
         return
     for i in range(n-1):
-        recurse(A, n-1)
+        heap_recurse(A, n-1)
         if n%2:
             A[0], A[n-1] = A[n-1], A[0]
         else:
             A[i], A[n-1] = A[n-1], A[i]
-    recurse(A, n-1)
+    heap_recurse(A, n-1)
 
-recurse(list(range(4)))
+heap_recurse(list(range(4)))
 assert(len(seen) == factorial(4))
+
+
+print("Modified Heap's algorithm:")
+# i -> n-1-i to reverse order of swapping
+prev = None
+seen = set()
+
+def mheap_recurse(A, n=None):
+    N = len(A)
+    if n is None:
+        n = N
+    if n == 1:
+        emit(A)
+        return
+    for i in range(n-1):
+        mheap_recurse(A, n-1)
+        if n%2:
+            A[N-1], A[N-n] = A[N-n], A[N-1]
+        else:
+            A[N-1-i], A[N-n] = A[N-n], A[N-1-i]
+    mheap_recurse(A, n-1)
+
+mheap_recurse(list(range(5)))
+assert(len(seen) == factorial(5))

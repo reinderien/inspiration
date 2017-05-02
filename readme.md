@@ -251,7 +251,7 @@ instance, for a 3-bit binary integer:
 
 ƒ can be modelled as a radix-4 integer with _n_ - 1 digits, where each digit represents one 
 operator, and the integer increments from 0 through 4<sup>n - 1</sup> - 1. There is benefit to 
-having it increment by Gray code instead of linearly. Whenever an ƒ<sub>i</sub> changes, the
+having it increment by (4,_n_)-Gray code instead of linearly. Whenever an ƒ<sub>i</sub> changes, the
 computed value from ƒ<sub>0</sub> through ƒ<sub>i - 1</sub> can stay the same; and the computed 
 composite function equivalent to ƒ<sub>i + 1</sub> through ƒ<sub>n - 2</sub> can also stay the same.
 

@@ -116,7 +116,7 @@ solutions in the problem space as well as (more importantly) the number of candi
 before the first solution is found.
 
 For example, evaluating all of the possible inputs where _n_ = 4, _N_ = 1536; and using the naïve
-algorithm described later, the problem difficult is heavily dependent on which inputs are chosen.
+algorithm described later, the problem difficulty is heavily dependent on which inputs are chosen.
 For the following inputs, a solution is found after only 7 iterations. There are 480 solutions
 (without discarding non-unique solutions):
 

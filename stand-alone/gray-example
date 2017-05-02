@@ -16,6 +16,7 @@ def emit(vals, i_changed):
     if prev:
         changed = sum(1 for a, b in zip(vals, prev) if a != b)
         assert(changed == 1)
+        assert(vals[i_changed] != prev[i_changed])
     prev = vals
 
 
@@ -26,16 +27,16 @@ def recurse(indices, depth, i_changed):
     :param depth: The current recursion depth, from n-1 through -1
     :param i_changed: The index of the only digit that has changed.
     """
-    if depth == -1:
+    if depth == len(indices):
         emit(indices, i_changed)
         return
 
     old = indices[depth]
     for delta in range(N):
         indices[depth] = (old + delta) % N
-        recurse(indices, depth-1, i_changed)
+        recurse(indices, depth+1, i_changed)
         i_changed = depth
 
 L = 3
-recurse([0]*L, L-1, 'init')
+recurse([0]*L, 0, 'init')
 assert(len(seen) == N**L)

@@ -6,9 +6,10 @@ seen = set()
 prev = None
 
 
-def emit(vals):
+def emit(vals, i_changed):
     vals = tuple(vals)
-    print(' '.join(ops[v] for v in vals))
+    print(vals, 'changed:', i_changed)
+
     assert(vals not in seen)
     seen.add(vals)
     global prev
@@ -18,16 +19,23 @@ def emit(vals):
     prev = vals
 
 
-def recurse(indices, depth):
+def recurse(indices, depth, i_changed):
+    """
+    This is a demonstration of a simple n-ary-Gray code recursive iterator.
+    :param indices: The digits of the generated Gray code number, 0-3
+    :param depth: The current recursion depth, from n-1 through -1
+    :param i_changed: The index of the only digit that has changed.
+    """
     if depth == -1:
-        emit(indices)
+        emit(indices, i_changed)
         return
 
     old = indices[depth]
     for delta in range(N):
         indices[depth] = (old + delta) % N
-        recurse(indices, depth-1)
+        recurse(indices, depth-1, i_changed)
+        i_changed = depth
 
 L = 3
-recurse([0]*L, L-1)
+recurse([0]*L, L-1, 'init')
 assert(len(seen) == N**L)

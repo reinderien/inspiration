@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+from math import factorial
+
+ops = '+-*/'
+seen = set()
+
+
+def emit(inputs, funs):
+    lhs = (' '.join('%d %s' % (i, ops[f])
+                    for i, f in zip(inputs[:-1], funs))
+           + ' %d' % inputs[-1])
+    assert(lhs not in seen)
+    seen.add(lhs)
+    print(lhs)
+
+
+def gray_recurse(inputs, funs, depth=0):
+    if depth == len(funs):
+        emit(inputs, funs)
+        return
+    old = funs[depth]
+    for delta in range(len(ops)):
+        funs[depth] = (old + delta) % len(ops)
+        gray_recurse(inputs, funs, depth+1)
+
+
+def heap_recurse(inputs, funs=None, depth=None):
+    n = len(inputs)
+    if funs is None:
+        funs = [0]*(n-1)
+    if depth is None:
+        depth = n
+    if depth == 1:
+        gray_recurse(inputs, funs)
+        return
+    for i in range(depth-1):
+        heap_recurse(inputs, funs, depth-1)
+        if depth % 2:
+            inputs[n-1], inputs[n-depth] = inputs[n-depth], inputs[n-1]
+        else:
+            inputs[n-1-i], inputs[n-depth] = inputs[n-depth], inputs[n-1-i]
+    heap_recurse(inputs, funs, depth-1)
+
+x = [1, 2, 3, 4]
+heap_recurse(x)
+assert(len(seen) == factorial(len(x)) * 4**(len(x)-1))

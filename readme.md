@@ -258,19 +258,18 @@ composite function equivalent to ƒ<sub>i + 1</sub> through ƒ<sub>n - 2</sub> c
 For _n_ = 4 and a single permutation of _x_, the search through all ƒ would look like:
 
     + + +
-    - + +
-    * + +
-    / + +
-    / - +
+    + + -
+    + + *
+    + + /
+    + - /
     + - +
-    - - +
-    * - +
-    * * +
-    / * +
+    + - -
+    + - *
+    + * *
+    + * /
     + * +
-    - * +
+    + * -
     ...
-    
 
 This optimization will have the greatest effect when the player has a large hand of up to 17 cards.
 

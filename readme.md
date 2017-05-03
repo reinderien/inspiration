@@ -274,6 +274,35 @@ For _n_ = 4 and a single permutation of _x_, the search through all ƒ would loo
 
 This optimization will have the greatest effect when the player has a large hand of up to 17 cards.
 
+
+### Heap's Permutations
+
+Similar in spirit to the Gray code approach, there is benefit to reducing the number of changed 
+elements between permutations of _x_.
+[Heap's permutation algorithm](https://en.wikipedia.org/wiki/Heap%27s_algorithm) is designed 
+specifically for this purpose. It guarantees that iteration through all permutations only does a 
+single swap of two elements at a time. The canonical implementation of the algorithm swaps most 
+frequently at the beginning of the set, but a simple index reversal allows swaps to occur most 
+frequently at the end, allowing more of the computed portion of the LHS to be saved from 
+iteration to iteration.
+
+For _n_ = 4, disregarding ƒ, the search through _x_ would look like:
+
+    (0, 1, 2, 3)
+    (0, 1, 3, 2)
+    (0, 2, 3, 1)
+    (0, 2, 1, 3)
+    (0, 3, 1, 2)
+    (0, 3, 2, 1)
+    (1, 3, 2, 0)
+    (1, 3, 0, 2)
+    (1, 2, 0, 3)
+    (1, 2, 3, 0)
+    (1, 0, 3, 2)
+    (1, 0, 2, 3)
+    ...
+
+
 ### Condensed-section
 
 todo.

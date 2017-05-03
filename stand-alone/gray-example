@@ -8,7 +8,7 @@ prev = None
 
 def emit(vals, i_changed):
     vals = tuple(vals)
-    print(vals, 'changed:', i_changed)
+    print(' '.join(ops[i] for i in vals))
 
     assert(vals not in seen)
     seen.add(vals)

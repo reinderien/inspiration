@@ -70,5 +70,6 @@ def mheap_recurse(A, n=None):
             A[N-1-i], A[N-n] = A[N-n], A[N-1-i]
     mheap_recurse(A, n-1)
 
-mheap_recurse(list(range(5)))
-assert(len(seen) == factorial(5))
+size = 4
+mheap_recurse(list(range(size)))
+assert(len(seen) == factorial(size))

@@ -302,6 +302,33 @@ For _n_ = 4, disregarding ƒ, the search through _x_ would look like:
     ...
 
 
+### Gray-Heap Iteration
+
+It would be interesting to try combined Gray-Heap iteration using the above methods. This would 
+produce a series of LHS candidates looking like:
+
+    1 + 2 + 3 + 4
+    1 + 2 + 3 - 4
+    1 + 2 + 3 * 4
+    1 + 2 + 3 / 4
+    1 + 2 - 3 / 4
+    ...
+    4 - 3 + 2 - 1
+    4 - 3 + 2 * 1
+    4 - 3 + 2 / 1
+    4 - 3 + 2 + 1
+    4 - 3 + 1 + 2
+    4 - 3 + 1 - 2
+    4 - 3 + 1 * 2
+    4 - 3 + 1 / 2
+    ...
+    4 + 1 / 2 - 3
+    4 + 1 + 2 - 3
+    4 + 1 + 2 * 3
+    4 + 1 + 2 / 3
+    4 + 1 + 2 + 3
+
+
 ### Condensed-section
 
 todo.

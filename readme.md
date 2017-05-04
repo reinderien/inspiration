@@ -176,48 +176,6 @@ through ƒ is O(4<sup>n - 1</sup>), and the evaluation of the LHS is O(n), the o
 runtime is O(n! 4<sup>n - 1</sup> n) .
 
 
-### Naïve/Parallel
-
-This algorithm is easily parallelized: the simplest method is to perform the permutation in a parent
-thread and assign subdivided ƒ search space to _m_ children, such that all children have the same
-set of inputs in the same order but attempt different combinations for ƒ. Each child will have a
-search space size of 4<sup>n - 1</sup>/m . Whichever child finds the first solution returns it to
-the parent, the parent cancels all children and completes execution.
-
-    for each of n! permutations of x:
-        fork m children each searching 4^(n-1) / m combinations of ƒ
-        join on any child completion
-        if a child found a solution:
-            cancel other children
-            print solution
-            exit
-        join on all remaining children
-
-### Naïve/Parallel with SIMD
-
-A more carefully optimized solution would be to use
-[SIMD](https://en.wikipedia.org/wiki/SIMD) on an appropriate processor architecture - either on a 
-CPU or a GPU.
-
-Contemporary Intel CPUs offer up to
-[512-element-wide SIMD](https://en.wikipedia.org/wiki/AVX-512),
-[28 cores](https://en.wikipedia.org/wiki/List_of_Intel_Xeon_microprocessors#.22Skylake-SP.22_.2814_nm.29_Scalable_Performance),
-and 2 semi-parallel "hyper-threads" per core, allowing a theoretical parallel speedup on the order
-of ~10,000 - 20,000.
-
-Using [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)
-can offer even greater parallel speedup. For example, nVidia offers GPUs with core counts well in 
-excess of
-[4,000](https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units#Tesla) before 
-taking other parallelism into account. There are various Python bindings for
-[OpenCL](https://en.wikipedia.org/wiki/OpenCL) able to target this hardware.
-
-Using a SIMD scheme, there would be two levels of parallelism: core/thread children, and vectorized 
-elements within each of those cores. Within a single core, each element of the vectorized operation
-would have to have a different set of _x_ inputs but the same ƒ operations. Division of the _x_ 
-search space would then need to occur across SIMD elements, with all elements in the core using the
-same ƒ set. The top-level parent would divide the ƒ search space across cores.
-
 ### Recursive-ƒ
 
 Whenever a new ƒ is attempted in the naïve algorithm, it takes O(n) time to re-evaluate the LHS in
@@ -332,3 +290,71 @@ produce a series of LHS candidates looking like:
 ### Condensed-section
 
 todo.
+
+
+## Hardware Considerations
+
+### Precision
+
+The equation with the maximal intermediate value is where _n_ takes its maximum of 17, _x_ and _y_ 
+take their maxima of 9, and only multiplication and division are used:
+
+    9^8 / 9^8 * 9 = 9
+
+The maximal intermediate value then requires an integer width of:
+
+    ceil( 8*ln(9)/ln(2) ) = 26 bits
+
+If using integer math with a fraction, 32-bit signed integers will suffice. 
+
+Single-precision (32-bit) floating-point has a 24-bit significand. As such, it would suffice for _n_
+≤ 15, since 9<sup>7</sup> < 2<sup>24</sup>. Above that, it is insufficient for the worst edge 
+cases, and double (64-bit) floating-point would be required instead.
+
+### Parallelism
+
+The naïve algorithm is easily parallelized (and is, perhaps, even one of
+[Moler's embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel#Etymology)
+problems).
+The simplest method is to perform the permutation in a parent thread and assign subdivided ƒ search 
+space to _m_ children, such that all children have the same set of inputs in the same order but 
+attempt different combinations for ƒ. Each child will have a search space size of 4<sup>n - 
+1</sup>/m . Whichever child finds the first solution returns it to the parent, the parent cancels
+all children and completes execution. In pseudocode,
+
+    for each of n! permutations of x:
+        fork m children each searching 4^(n-1) / m combinations of ƒ
+        join on any child completion
+        if a child found a solution:
+            cancel other children
+            print solution
+            exit
+        join on all remaining children
+
+### Parallelism with SIMD
+
+A more carefully optimized solution would be to use
+[SIMD](https://en.wikipedia.org/wiki/SIMD) on an appropriate processor architecture - either on a 
+CPU or a GPU.
+
+Contemporary Intel CPUs offer up to
+[28 cores](https://en.wikipedia.org/wiki/List_of_Intel_Xeon_microprocessors#.22Skylake-SP.22_.2814_nm.29_Scalable_Performance),
+2 semi-parallel "hyper-threads" per core, and
+[512-bit-wide vectorized math](https://en.wikipedia.org/wiki/AVX-512). From the first version of
+[SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) onward, single-precision 
+floating-point vectorized math has been supported. In 512-bit single-precision vectorized mode, 16
+values can be operated upon at once. This all allows a theoretical parallel speedup factor of up
+to 896.
+
+Using [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)
+can offer even greater parallel speedup. For example, nVidia offers GPUs with core counts well in 
+excess of
+[4,000](https://en.wikipedia.org/wiki/List_of_Nvidia_graphics_processing_units#Tesla) before 
+taking other parallelism into account. There are various Python bindings for
+[OpenCL](https://en.wikipedia.org/wiki/OpenCL) able to target this hardware.
+
+Using a SIMD scheme, there would be two levels of parallelism: core/thread children, and vectorized 
+elements within each of those cores. Within a single core, each element of the vectorized operation
+would have to have a different set of _x_ inputs but the same ƒ operations. Division of the _x_ 
+search space would then need to occur across SIMD elements, with all elements in the core using the
+same ƒ set. The top-level parent would divide the ƒ search space across cores.

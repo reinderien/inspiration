@@ -340,11 +340,9 @@ CPU or a GPU.
 Contemporary Intel CPUs offer up to
 [28 cores](https://en.wikipedia.org/wiki/List_of_Intel_Xeon_microprocessors#.22Skylake-SP.22_.2814_nm.29_Scalable_Performance),
 2 semi-parallel "hyper-threads" per core, and
-[512-bit-wide vectorized math](https://en.wikipedia.org/wiki/AVX-512). From the first version of
-[SSE](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions) onward, single-precision 
-floating-point vectorized math has been supported. In 512-bit single-precision vectorized mode, 16
-values can be operated upon at once. This all allows a theoretical parallel speedup factor of up
-to 896.
+[512-bit-wide vectorized math](https://en.wikipedia.org/wiki/AVX-512). In 512-bit single-precision 
+vectorized mode, 16 values can be operated upon at once. This all allows a theoretical parallel 
+speedup factor of up to 896.
 
 Using [GPGPU](https://en.wikipedia.org/wiki/General-purpose_computing_on_graphics_processing_units)
 can offer even greater parallel speedup. For example, nVidia offers GPUs with core counts well in 
